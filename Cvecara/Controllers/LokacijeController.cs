@@ -36,9 +36,9 @@ namespace Cvecara.Controllers
         [Authorize(Roles = "Zaposleni")]
         [HttpGet]
         [HttpHead]
-        public ActionResult<List<Lokacije>> GetLokacije()
+        public ActionResult<List<Lokacije>> GetLokacije(string nazivLokacije)
         {
-            var lokacije = lokacijeRepository.GetAllLokacije();
+            var lokacije = lokacijeRepository.GetAllLokacije(nazivLokacije);
             if (lokacije == null || lokacije.Count == 0)
             {
                 return NoContent();

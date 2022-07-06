@@ -18,30 +18,37 @@ namespace Cvecara.Controllers
     public class CvetniAranzmanController : ControllerBase
     {
         private readonly ICvetniAranzmanRepository cvetniAranzmanRepository;
-
         private readonly LinkGenerator linkGenerator;
         private readonly IMapper mapper;
+        private readonly IPakovanjeRepository pakovanjeRepository;
 
-        public CvetniAranzmanController(ICvetniAranzmanRepository cvetniAranzmanRepository, LinkGenerator linkGenerator, IMapper mapper)
+        public CvetniAranzmanController(ICvetniAranzmanRepository cvetniAranzmanRepository, IPakovanjeRepository pakovanjeRepository, LinkGenerator linkGenerator, IMapper mapper)
         {
             this.cvetniAranzmanRepository = cvetniAranzmanRepository;
             this.linkGenerator = linkGenerator;
             this.mapper = mapper;
+            this.pakovanjeRepository = pakovanjeRepository;
 
         }
 
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [Authorize(Roles = "Zaposleni, Kupac")]
+       // [Authorize]
         [HttpGet]
         [HttpHead]
-        public ActionResult<List<CvetniAranzman>> GetCvetniAranzmani()
+        public ActionResult<List<CvetniAranzman>> GetCvetniAranzmani(string nazivCvetnogAranzmana)
         {
-            var cvetniAranzmani = cvetniAranzmanRepository.GetAllCvetniAranzmani();
+            var cvetniAranzmani = cvetniAranzmanRepository.GetAllCvetniAranzmani(nazivCvetnogAranzmana);
             if (cvetniAranzmani == null || cvetniAranzmani.Count == 0)
             {
                 return NoContent();
+            }
+
+            foreach (CvetniAranzman cvetniAranzman in cvetniAranzmani)
+            {
+                Pakovanje pakovanje = pakovanjeRepository.GetPakovanjeById(cvetniAranzman.pakovanjeID);
+                cvetniAranzman.pakovanje = pakovanje;
             }
 
             return Ok(cvetniAranzmani);
@@ -60,6 +67,9 @@ namespace Cvecara.Controllers
             {
                 return NotFound();
             }
+
+            Pakovanje pakovanje = pakovanjeRepository.GetPakovanjeById(cvetniAranzman.pakovanjeID);
+            cvetniAranzman.pakovanje = pakovanje;
 
             return Ok(mapper.Map<CvetniAranzman>(cvetniAranzman));
         }

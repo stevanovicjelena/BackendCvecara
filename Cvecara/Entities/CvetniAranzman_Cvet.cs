@@ -13,8 +13,12 @@ namespace Cvecara.Entities
         public int cvetniAranzman_Cvet_ID { get; set; }
         [ForeignKey ("CvetniAranzman")]
         public int cvetniAranzmanID { get; set; }
+        [NotMapped]
+        public virtual CvetniAranzman cvetniAranzman { get; set; }
         [ForeignKey ("Cvet")]
         public int cvetID { get; set; }
+        [NotMapped]
+        public virtual Cvet cvet { get; set; }
         public int brojCvetova { get; set; }
     }
 }

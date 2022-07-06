@@ -10,6 +10,7 @@ namespace Cvecara.Repository
     {
         Porudzbina GetPorudzbinaById(int porudzbinaId);
         List<Porudzbina> GetAllPorudzbine();
+        List<Porudzbina> GetPorudzbinaByKupac(int kupacId);
         Porudzbina CreatePorudzbina(Porudzbina porudzbina);
         void UpdatePorudzbina(Porudzbina porudzbina);
         void DeletePorudzbina(int porudzbinaId);

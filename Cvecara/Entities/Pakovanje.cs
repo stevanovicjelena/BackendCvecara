@@ -14,5 +14,6 @@ namespace Cvecara.Entities
 		public string bojaPakovanja { get; set; }
 		public string opisPakovanja { get; set; }
 		public decimal cenaPakovanja { get; set; }
+		public int kolicina { get; set; }
 	}
 }

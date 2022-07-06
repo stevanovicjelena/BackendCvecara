@@ -9,7 +9,7 @@ namespace Cvecara.Repository
     public interface IVrstaCvetaRepository
     {
         VrstaCveta GetVrstaCvetaById(int vrstaCvetaId);
-        List<VrstaCveta> GetAllVrsteCvetova();
+        List<VrstaCveta> GetAllVrsteCvetova(string nazivVrste);
         VrstaCveta CreateVrstaCveta(VrstaCveta vrstaCveta);
         void UpdateVrstaCveta(VrstaCveta vrstaCveta);
         void DeleteVrstaCveta(int vrstaCvetaId);

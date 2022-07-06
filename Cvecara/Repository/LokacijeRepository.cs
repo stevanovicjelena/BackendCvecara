@@ -18,9 +18,12 @@ namespace Cvecara.Repository
             this.mapper = mapper;
         }
 
-        public List<Lokacije> GetAllLokacije()
+        public List<Lokacije> GetAllLokacije(string nazivLokacije)
         {
-            return context.Lokacije.ToList();
+            var lokacije = context.Lokacije.ToList();
+            return (from l in lokacije
+                    where string.IsNullOrEmpty(nazivLokacije) || l.nazivLokacije == nazivLokacije
+                    select l).ToList();
         }
         public Lokacije GetLokacijeById(int lokacijeId)
         {

@@ -21,12 +21,16 @@ namespace Cvecara.Controllers
 
         private readonly LinkGenerator linkGenerator;
         private readonly IMapper mapper;
+        private readonly IPorudzbinaRepository porudzbinaRepository;
+        private readonly IDodatakRepository dodatakRepository;
 
-        public Porudzbina_DodatakController(IPorudzbina_DodatakRepository porudzbina_dodatakRepository, LinkGenerator linkGenerator, IMapper mapper)
+        public Porudzbina_DodatakController(IPorudzbina_DodatakRepository porudzbina_dodatakRepository, IPorudzbinaRepository porudzbinaRepository, IDodatakRepository dodatakRepository, LinkGenerator linkGenerator, IMapper mapper)
         {
             this.porudzbina_dodatakRepository = porudzbina_dodatakRepository;
             this.linkGenerator = linkGenerator;
             this.mapper = mapper;
+            this.porudzbinaRepository = porudzbinaRepository;
+            this.dodatakRepository = dodatakRepository;
 
         }
 
@@ -42,6 +46,15 @@ namespace Cvecara.Controllers
             if (porudzbine_dodaci == null || porudzbine_dodaci.Count == 0)
             {
                 return NoContent();
+            }
+
+            foreach (Porudzbina_Dodatak pd in porudzbine_dodaci)
+            {
+                Porudzbina porudzbina = porudzbinaRepository.GetPorudzbinaById(pd.porudzbinaID);
+                pd.porudzbina = porudzbina;
+
+                Dodatak dodatak = dodatakRepository.GetDodatakById(pd.dodatakID);
+                pd.dodatak = dodatak;
             }
 
             return Ok(porudzbine_dodaci);
@@ -60,6 +73,12 @@ namespace Cvecara.Controllers
             {
                 return NotFound();
             }
+
+            Porudzbina porudzbina = porudzbinaRepository.GetPorudzbinaById(porudzbina_dodatak.porudzbinaID);
+            porudzbina_dodatak.porudzbina = porudzbina;
+
+            Dodatak dodatak = dodatakRepository.GetDodatakById(porudzbina_dodatak.dodatakID);
+            porudzbina_dodatak.dodatak = dodatak;
 
             return Ok(mapper.Map<Porudzbina_Dodatak>(porudzbina_dodatak));
         }

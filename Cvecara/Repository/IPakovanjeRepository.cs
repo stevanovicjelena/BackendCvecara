@@ -9,7 +9,7 @@ namespace Cvecara.Repository
     public interface IPakovanjeRepository
     {
         Pakovanje GetPakovanjeById(int pakovanjeId);
-        List<Pakovanje> GetAllPakovanja();
+        List<Pakovanje> GetAllPakovanja(string nazivPakovanja);
         Pakovanje CreatePakovanje(Pakovanje pakovanje);
         void UpdatePakovanje(Pakovanje pakovanje);
         void DeletePakovanje(int pakovanjeId);

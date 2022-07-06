@@ -18,9 +18,12 @@ namespace Cvecara.Repository
             this.mapper = mapper;
         }
 
-        public List<Dodatak> GetAllDodaci()
+        public List<Dodatak> GetAllDodaci(string bojaDodatka)
         {
-            return context.Dodatak.ToList();
+            var dodaci = context.Dodatak.ToList();
+            return (from d in dodaci
+                    where string.IsNullOrEmpty(bojaDodatka) || d.bojaDodatka == bojaDodatka
+                    select d).ToList();
         }
         public Dodatak GetDodatakById(int dodatakId)
         {

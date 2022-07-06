@@ -18,15 +18,18 @@ namespace Cvecara.Controllers
     public class CvetniAranzman_CvetController : ControllerBase
     {
         private readonly ICvetniAranzman_CvetRepository cvetniAranzman_CvetRepository;
-
         private readonly LinkGenerator linkGenerator;
         private readonly IMapper mapper;
+        private readonly ICvetRepository cvetRepository;
+        private readonly ICvetniAranzmanRepository cvetniAranzmanRepository;
 
-        public CvetniAranzman_CvetController(ICvetniAranzman_CvetRepository cvetniAranzman_CvetRepository, LinkGenerator linkGenerator, IMapper mapper)
+        public CvetniAranzman_CvetController(ICvetniAranzman_CvetRepository cvetniAranzman_CvetRepository, ICvetRepository cvetRepository, ICvetniAranzmanRepository cvetniAranzmanRepository, LinkGenerator linkGenerator, IMapper mapper)
         {
             this.cvetniAranzman_CvetRepository = cvetniAranzman_CvetRepository;
             this.linkGenerator = linkGenerator;
             this.mapper = mapper;
+            this.cvetRepository = cvetRepository;
+            this.cvetniAranzmanRepository = cvetniAranzmanRepository;
 
         }
 
@@ -42,6 +45,15 @@ namespace Cvecara.Controllers
             if (cvetniAranzmani_Cvetovi == null || cvetniAranzmani_Cvetovi.Count == 0)
             {
                 return NoContent();
+            }
+
+            foreach (CvetniAranzman_Cvet cvetniAranzman_Cvet in cvetniAranzmani_Cvetovi)
+            {
+                Cvet cvet = cvetRepository.GetCvetById(cvetniAranzman_Cvet.cvetID);
+                cvetniAranzman_Cvet.cvet = cvet;
+
+                CvetniAranzman cvetniAranzman = cvetniAranzmanRepository.GetCvetniAranzmanById(cvetniAranzman_Cvet.cvetniAranzmanID);
+                cvetniAranzman_Cvet.cvetniAranzman = cvetniAranzman;
             }
 
             return Ok(cvetniAranzmani_Cvetovi);
@@ -60,6 +72,12 @@ namespace Cvecara.Controllers
             {
                 return NotFound();
             }
+
+            Cvet cvet = cvetRepository.GetCvetById(cvetniAranzman_Cvet.cvetID);
+            cvetniAranzman_Cvet.cvet = cvet;
+
+            CvetniAranzman cvetniAranzman = cvetniAranzmanRepository.GetCvetniAranzmanById(cvetniAranzman_Cvet.cvetniAranzmanID);
+            cvetniAranzman_Cvet.cvetniAranzman = cvetniAranzman;
 
             return Ok(mapper.Map<CvetniAranzman_Cvet>(cvetniAranzman_Cvet));
         }

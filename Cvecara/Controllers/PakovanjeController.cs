@@ -36,9 +36,9 @@ namespace Cvecara.Controllers
         [Authorize(Roles = "Zaposleni, Kupac")]
         [HttpGet]
         [HttpHead]
-        public ActionResult<List<Pakovanje>> GetPakovanja()
+        public ActionResult<List<Pakovanje>> GetPakovanja(string nazivPakovanja)
         {
-            var pakovanja = pakovanjeRepository.GetAllPakovanja();
+            var pakovanja = pakovanjeRepository.GetAllPakovanja(nazivPakovanja);
             if (pakovanja == null || pakovanja.Count == 0)
             {
                 return NoContent();

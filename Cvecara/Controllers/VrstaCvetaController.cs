@@ -36,9 +36,9 @@ namespace Cvecara.Controllers
         [Authorize(Roles = "Zaposleni, Kupac")]
         [HttpGet]
         [HttpHead]
-        public ActionResult<List<VrstaCveta>> GetVrsteCvetova()
+        public ActionResult<List<VrstaCveta>> GetVrsteCvetova(string nazivVrste)
         {
-            var vrsteCvetova = vrstaCvetaRepository.GetAllVrsteCvetova();
+            var vrsteCvetova = vrstaCvetaRepository.GetAllVrsteCvetova(nazivVrste);
             if (vrsteCvetova == null || vrsteCvetova.Count == 0)
             {
                 return NoContent();

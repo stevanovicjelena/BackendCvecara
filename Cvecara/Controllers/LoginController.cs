@@ -14,68 +14,101 @@ using System.Threading.Tasks;
 
 namespace Cvecara.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     [Produces("application/json", "applciation/xml")]
     public class LoginController : ControllerBase
     {
         private IConfiguration config;
         private CvecaraContext context;
-        private readonly IKupacRepository kupacRepository;
-        public LoginController(IConfiguration config, CvecaraContext context, IKupacRepository kupacRepository)
+        private readonly IUserRepository userRepository;
+        public LoginController(IConfiguration config, CvecaraContext context, IUserRepository userRepository)
         {
             this.config = config;
             this.context = context;
-            this.kupacRepository = kupacRepository;
+            this.userRepository = userRepository;
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        public IActionResult Login([FromBody] KupacLogin kupacLogin)
+        [HttpPost ("login")]
+        public IActionResult Login([FromBody] UserLogin userLogin)
         {
-            var user = Authenticate(kupacLogin);
+            var user = Authenticate(userLogin);
 
             if (user != null)
             {
                 var token = Generate(user);
-                return Ok(token);
+                var id = user.userID;
+                //AuthenticatedResponse authenticatedResponse = new AuthenticatedResponse { Token = token };
+                return Ok(new AuthenticatedResponse { Token = token, id = id });
+
+              //  return Ok(token);
             }
 
             return NotFound("User not found");
         }
 
-        private string Generate(Kupac kupac)
+        private string Generate(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            //var claims = new[]
+            //{
+            //    new Claim(ClaimTypes.NameIdentifier, user.korisnickoImeUser),
+            //    new Claim(ClaimTypes.Email, user.emailUser),
+            //    new Claim(ClaimTypes.GivenName, user.imeUser),
+            //    new Claim(ClaimTypes.Surname, user.prezimeUser),
+            //    new Claim(ClaimTypes.Role, user.uloga)
+            //};
+
+            var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, kupac.korisnickoImeKupca),
-                new Claim(ClaimTypes.Email, kupac.emailKupca),
-                new Claim(ClaimTypes.GivenName, kupac.imeKupca),
-                new Claim(ClaimTypes.Surname, kupac.prezimeKupca),
-                new Claim(ClaimTypes.Role, kupac.uloga)
+                new Claim(ClaimTypes.NameIdentifier, user.korisnickoImeUser),
+                new Claim(ClaimTypes.Email, user.emailUser),
+                new Claim(ClaimTypes.GivenName, user.imeUser),
+                new Claim(ClaimTypes.Surname, user.prezimeUser),
+                new Claim(ClaimTypes.Role, user.uloga)
             };
 
             var token = new JwtSecurityToken(config["Jwt:Issuer"],
               config["Jwt:Audience"],
-              claims,
-              expires: DateTime.Now.AddMinutes(45),
+              claims: claims,
+              expires: DateTime.Now.AddHours(1),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+
+            //var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
+            //var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            //var tokeOptions = new JwtSecurityToken(
+            //    issuer: "https://localhost:44379",
+            //    audience: "https://localhost:44379",
+            //    claims: new List<Claim>(),
+            //    expires: DateTime.Now.AddMinutes(5),
+            //    signingCredentials: signinCredentials
+            //);
+
+            //var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+
+
+
+            //return tokenString;
+
+            //return Ok(new AuthenticatedResponse { Token = tokenString });
+
+
         }
 
-        private Kupac Authenticate(KupacLogin kupacLogin)
+        private User Authenticate(UserLogin userLogin)
         {
-            var kupci = kupacRepository.GetAllKupci();
+            var kupci = userRepository.GetAllUsers();
 
             if (kupci != null) 
             {
-                foreach (Kupac k in kupci)
+                foreach (User k in kupci)
                 {
-                    if (k.korisnickoImeKupca.ToLower() == kupacLogin.korisnickoIme.ToLower() && k.lozinkaKupca.ToLower() == kupacLogin.lozinka.ToLower())
+                    if (k.korisnickoImeUser.ToLower() == userLogin.korisnickoIme.ToLower() && k.lozinkaUser.ToLower() == userLogin.lozinka.ToLower())
                     {
                         return k;
                     }

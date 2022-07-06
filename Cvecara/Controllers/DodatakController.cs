@@ -21,27 +21,35 @@ namespace Cvecara.Controllers
 
         private readonly LinkGenerator linkGenerator;
         private readonly IMapper mapper;
+        public readonly ITipDodatkaRepository tipDodatkaRepository;
 
-        public DodatakController(IDodatakRepository dodatakRepository, LinkGenerator linkGenerator, IMapper mapper)
+        public DodatakController(IDodatakRepository dodatakRepository, ITipDodatkaRepository tipDodatkaRepository, LinkGenerator linkGenerator, IMapper mapper)
         {
             this.dodatakRepository = dodatakRepository;
             this.linkGenerator = linkGenerator;
             this.mapper = mapper;
+            this.tipDodatkaRepository = tipDodatkaRepository;
 
         }
 
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [Authorize(Roles = "Zaposleni, Kupac")]
+     //   [Authorize(Roles = "Zaposleni, Kupac")]
         [HttpGet]
         [HttpHead]
-        public ActionResult<List<Dodatak>> GetDodaci()
+        public ActionResult<List<Dodatak>> GetDodaci(string bojaDodatka)
         {
-            var dodaci = dodatakRepository.GetAllDodaci();
+            var dodaci = dodatakRepository.GetAllDodaci(bojaDodatka);
             if (dodaci == null || dodaci.Count == 0)
             {
                 return NoContent();
+            }
+
+            foreach (Dodatak d in dodaci)
+            {
+                TipDodatka tipDodatka = tipDodatkaRepository.GetTipDodatkaById(d.tipDodatkaID);
+                d.tipDodatka = tipDodatka;
             }
 
             return Ok(dodaci);

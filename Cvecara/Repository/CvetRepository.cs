@@ -19,9 +19,18 @@ namespace Cvecara.Repository
             this.mapper = mapper;
         }
 
+        //public List<Cvet> GetAllCvetovi( string bojaCveta)
+        //{
+        //    var cvetovi = context.Cvet.ToList();
+        //    return (from c in cvetovi
+        //            where string.IsNullOrEmpty(bojaCveta) || c.bojaCveta == bojaCveta
+        //            select c).ToList();
+        //}
+
         public List<Cvet> GetAllCvetovi()
         {
             return context.Cvet.ToList();
+           
         }
 
         public Cvet GetCvetById(int cvetId)
@@ -50,5 +59,6 @@ namespace Cvecara.Repository
             return context.SaveChanges() > 0;
         }
 
+     
     }
 }

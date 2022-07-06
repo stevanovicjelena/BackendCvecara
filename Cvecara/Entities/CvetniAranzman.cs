@@ -7,14 +7,17 @@ using System.Threading.Tasks;
 
 namespace Cvecara.Entities
 {
-    public class CvetniAranzman
-    {
+	public class CvetniAranzman
+	{
 		[Key]
 		public int cvetniAranzmanID { get; set; }
 		public string nazivAranzmana { get; set; }
 		public decimal cenaAranzmana { get; set; }
 		public string opisAranzmana { get; set; }
-		[ForeignKey ("Pakovanje")]
+		public int kolicina { get; set; }
+		[ForeignKey("Pakovanje")]
 		public int pakovanjeID { get; set; }
+		[NotMapped]
+		public virtual Pakovanje pakovanje {get; set;}
 	}
 }

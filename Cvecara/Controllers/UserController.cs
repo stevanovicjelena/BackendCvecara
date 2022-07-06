@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Cvecara.Entities;
 using Cvecara.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -12,18 +13,18 @@ using System.Threading.Tasks;
 namespace Cvecara.Controllers
 {
     [ApiController]
-    [Route("api/zaposleni")]
+    [Route("api/user")]
     [Produces("application/json", "applciation/xml")]
-    public class ZaposleniController : ControllerBase
+    public class UserController : ControllerBase
     {
-        private readonly IZaposleniRepository zaposleniRepository;
+        private readonly IUserRepository userRepository;
 
         private readonly LinkGenerator linkGenerator;
         private readonly IMapper mapper;
 
-        public ZaposleniController(IZaposleniRepository zaposleniRepository, LinkGenerator linkGenerator, IMapper mapper)
+        public UserController(IUserRepository userRepository, LinkGenerator linkGenerator, IMapper mapper)
         {
-            this.zaposleniRepository = zaposleniRepository;
+            this.userRepository = userRepository;
             this.linkGenerator = linkGenerator;
             this.mapper = mapper;
 
@@ -33,32 +34,34 @@ namespace Cvecara.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpGet]
+        [Authorize(Roles = "Zaposleni")]
         [HttpHead]
-        public ActionResult<List<Zaposleni>> GetZaposlene()
+        public ActionResult<List<User>> GetUsers()
         {
-            var zaposleni = zaposleniRepository.GetAllZaposlene();
-            if (zaposleni == null || zaposleni.Count == 0)
+            var users = userRepository.GetAllUsers();
+            if (users == null || users.Count == 0)
             {
                 return NoContent();
             }
 
-            return Ok(zaposleni);
+            return Ok(users);
         }
 
 
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpGet("{zaposleniId}")]
-        public ActionResult<Zaposleni> GetZaposleni(int zaposleniId)
+        [Authorize(Roles = "Zaposleni, Kupac")]
+        [HttpGet("{userId}")]
+        public ActionResult<User> GetUser(int userId)
         {
-            var zaposleni = zaposleniRepository.GetZaposleniById(zaposleniId);
+            var user = userRepository.GetUserById(userId);
 
-            if (zaposleni == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return Ok(mapper.Map<Zaposleni>(zaposleni));
+            return Ok(mapper.Map<User>(user));
         }
 
 
@@ -66,19 +69,19 @@ namespace Cvecara.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Consumes("application/json")]
         [HttpPost]
-        public ActionResult<Zaposleni> CreateZaposleni([FromBody] Zaposleni zaposleni)
+        public ActionResult<User> CreateUser([FromBody] User user)
         {
             try
             {
 
-                Zaposleni zaposleniEntity = mapper.Map<Zaposleni>(zaposleni);
-                Zaposleni confirmation = zaposleniRepository.CreateZaposleni(zaposleniEntity);
-                zaposleniRepository.SaveChanges();
+                User userEntity = mapper.Map<User>(user);
+                User confirmation = userRepository.CreateUser(userEntity);
+                userRepository.SaveChanges();
 
-                string location = linkGenerator.GetPathByAction("GetZaposleni", "Zaposleni", new { zaposleniId = confirmation.zaposleniID });
+                string location = linkGenerator.GetPathByAction("GetUser", "User", new { userId = confirmation.userID});
 
 
-                return Created(location, mapper.Map<Zaposleni>(confirmation));
+                return Created(location, mapper.Map<User>(confirmation));
 
             }
             catch (Exception)
@@ -93,22 +96,22 @@ namespace Cvecara.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Consumes("application/json")]
         [HttpPut]
-        public ActionResult<Zaposleni> Updatezaposleni([FromBody] Zaposleni zaposleni)
+        public ActionResult<User> UpdateUser([FromBody] User user)
         {
             try
             {
-                var oldZaposleni = zaposleniRepository.GetZaposleniById(zaposleni.zaposleniID);
+                var oldUser = userRepository.GetUserById(user.userID);
 
-                if (oldZaposleni == null)
+                if (oldUser == null)
                 {
                     return NotFound();
                 }
 
-                Zaposleni zaposleniEntity = mapper.Map<Zaposleni>(zaposleni);
-                mapper.Map(zaposleniEntity, oldZaposleni);
-                zaposleniRepository.SaveChanges();
+                User userEntity = mapper.Map<User>(user);
+                mapper.Map(userEntity, oldUser);
+                userRepository.SaveChanges();
 
-                return Ok(mapper.Map<Zaposleni>(zaposleni));
+                return Ok(mapper.Map<User>(user));
             }
             catch (Exception)
             {
@@ -121,20 +124,20 @@ namespace Cvecara.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpDelete("{zaposleniId}")]
-        public IActionResult DeleteZaposleni(int zaposleniId)
+        [HttpDelete("{userId}")]
+        public IActionResult DeleteUser(int userId)
         {
             try
             {
-                var zaposleni = zaposleniRepository.GetZaposleniById(zaposleniId);
+                var user = userRepository.GetUserById(userId);
 
-                if (zaposleni == null)
+                if (user == null)
                 {
                     return NotFound();
                 }
 
-                zaposleniRepository.DeleteZaposleni(zaposleniId);
-                zaposleniRepository.SaveChanges();
+                userRepository.DeleteUser(userId);
+                userRepository.SaveChanges();
 
                 return Ok();
             }

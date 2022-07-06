@@ -18,9 +18,12 @@ namespace Cvecara.Repository
             this.mapper = mapper;
         }
 
-        public List<Pakovanje> GetAllPakovanja()
+        public List<Pakovanje> GetAllPakovanja(string nazivPakovanja)
         {
-            return context.Pakovanje.ToList();
+            var pakovanja = context.Pakovanje.ToList();
+            return (from p in pakovanja
+                    where string.IsNullOrEmpty(nazivPakovanja) || p.nazivPakovanja == nazivPakovanja
+                    select p).ToList();
         }
         public Pakovanje GetPakovanjeById(int pakovanjeId)
         {

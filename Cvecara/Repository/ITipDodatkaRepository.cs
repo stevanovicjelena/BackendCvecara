@@ -9,7 +9,7 @@ namespace Cvecara.Repository
     public interface ITipDodatkaRepository
     {
         TipDodatka GetTipDodatkaById(int tipDodatkaId);
-        List<TipDodatka> GetAllTipoveDodataka();
+        List<TipDodatka> GetAllTipoveDodataka(string nazivTipa);
         TipDodatka CreateTipDodatka(TipDodatka tipDodatka);
         void UpdateTipDodatka(TipDodatka tipDodatka);
         void DeleteTipDodatka(int tipDodatkaId);

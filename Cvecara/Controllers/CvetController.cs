@@ -21,19 +21,23 @@ namespace Cvecara.Controllers
 
         private readonly LinkGenerator linkGenerator;
         private readonly IMapper mapper;
+        private readonly IVrstaCvetaRepository vrstaCvetaRepository;
 
-        public CvetController(ICvetRepository cvetRepository, LinkGenerator linkGenerator, IMapper mapper)
+        public CvetController(ICvetRepository cvetRepository, IVrstaCvetaRepository vrstaCvetaRepository, LinkGenerator linkGenerator, IMapper mapper)
         {
             this.cvetRepository = cvetRepository;
             this.linkGenerator = linkGenerator;
             this.mapper = mapper;
+            this.vrstaCvetaRepository = vrstaCvetaRepository;
 
         }
 
-        
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Roles = "Zaposleni, Kupac")]
+      // [Authorize(Roles = "Kupac")]
+       // [Authorize]
         [HttpGet]
         [HttpHead]
         public ActionResult<List<Cvet>> GetCvetovi()
@@ -44,10 +48,16 @@ namespace Cvecara.Controllers
                 return NoContent();
             }
 
+            foreach (Cvet cvet in cvetovi)
+            {
+                VrstaCveta vrstaCveta = vrstaCvetaRepository.GetVrstaCvetaById(cvet.vrstaCvetaID);
+                cvet.vrstaCveta = vrstaCveta;
+            }
+
             return Ok(cvetovi);
         }
 
-        
+
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "Zaposleni")]
@@ -60,6 +70,9 @@ namespace Cvecara.Controllers
             {
                 return NotFound();
             }
+
+            VrstaCveta vrstaCveta = vrstaCvetaRepository.GetVrstaCvetaById(cvet.vrstaCvetaID);
+            cvet.vrstaCveta = vrstaCveta;
 
             return Ok(mapper.Map<Cvet>(cvet));
         }
@@ -82,7 +95,7 @@ namespace Cvecara.Controllers
                 string location = linkGenerator.GetPathByAction("GetCvet", "Cvet", new { cvetId = confirmation.cvetID});
 
                 return StatusCode(StatusCodes.Status201Created, "Successfully created");
-                //return Created(location, mapper.Map<Cvet>(confirmation));
+                
             }
             catch (Exception)
             {
@@ -109,10 +122,11 @@ namespace Cvecara.Controllers
                 }
 
                 Cvet cvetEntity = mapper.Map<Cvet>(cvet);
+
                 mapper.Map(cvetEntity, oldCvet);
                 cvetRepository.SaveChanges();
 
-                return Ok(mapper.Map<Cvet>(cvet));
+                return Ok();
             }
             catch (Exception)
             {

@@ -13,8 +13,12 @@ namespace Cvecara.Entities
         public int porudzbina_Dodatak_ID { get; set; }
         [ForeignKey ("Porudzbina")]
         public int porudzbinaID { get; set; }
+        [NotMapped]
+        public virtual Porudzbina porudzbina { get; set; }
         [ForeignKey ("Dodatak")]
         public int dodatakID { get; set; }
+        [NotMapped]
+        public virtual Dodatak dodatak { get; set; }
         public int kolicinaDodatka { get; set; }
     }
 }

@@ -18,9 +18,12 @@ namespace Cvecara.Repository
             this.mapper = mapper;
         }
 
-        public List<TipDodatka> GetAllTipoveDodataka()
+        public List<TipDodatka> GetAllTipoveDodataka(string nazivTipa)
         {
-            return context.TipDodatka.ToList();
+            var tipoviDodataka = context.TipDodatka.ToList();
+            return (from td in tipoviDodataka
+                    where string.IsNullOrEmpty(nazivTipa) || td.nazivTipaDodatka == nazivTipa
+                    select td).ToList();
         }
         public TipDodatka GetTipDodatkaById(int tipDodatkaId)
         {

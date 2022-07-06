@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Cvecara.Profiles
 {
-    public class ZaposleniProfile : Profile
+    public class UserProfile : Profile
     {
-        public ZaposleniProfile()
+        public UserProfile()
         {
 
-            CreateMap<Zaposleni, Zaposleni>();
+            CreateMap<User, User>();
 
         }
     }

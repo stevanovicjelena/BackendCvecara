@@ -18,9 +18,12 @@ namespace Cvecara.Repository
             this.mapper = mapper;
         }
 
-        public List<VrstaCveta> GetAllVrsteCvetova()
+        public List<VrstaCveta> GetAllVrsteCvetova(string nazivVrste)
         {
-            return context.VrstaCveta.ToList();
+            var vrste = context.VrstaCveta.ToList();
+            return (from v in vrste
+                    where string.IsNullOrEmpty(nazivVrste) || v.nazivVrste == nazivVrste
+                    select v).ToList();
         }
         public VrstaCveta GetVrstaCvetaById(int vrstaCvetaId)
         {

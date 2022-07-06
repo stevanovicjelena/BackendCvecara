@@ -28,6 +28,9 @@ namespace Cvecara.Repository
         }
         public Porudzbina CreatePorudzbina(Porudzbina porudzbina)
         {
+           // var ukupnaCena = porudzbina.cvetniAranzman.cenaAranzmana * porudzbina.kolicina;
+            //porudzbina.cenaPorudzbine = ukupnaCena;
+
             var createdEntity = context.Add(porudzbina);
             return mapper.Map<Porudzbina>(createdEntity.Entity);
         }
@@ -46,6 +49,11 @@ namespace Cvecara.Repository
         public void UpdatePorudzbina(Porudzbina porudzbina)
         {
             throw new NotImplementedException();
+        }
+
+        public List<Porudzbina> GetPorudzbinaByKupac(int kupacId)
+        {
+            return context.Porudzbina.Where(e => e.kupacID == kupacId).ToList();
         }
     }
 }

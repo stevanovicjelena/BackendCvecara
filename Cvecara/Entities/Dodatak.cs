@@ -13,7 +13,10 @@ namespace Cvecara.Entities
         public int dodatakID { get; set; }
         public string bojaDodatka { get; set; }
         public decimal cenaDodatka { get; set; }
+        public int kolicina { get; set; }
         [ForeignKey ("TipDodatka")]
         public int tipDodatkaID { get; set; }
+        [NotMapped]
+        public virtual TipDodatka tipDodatka { get; set; }
     }
 }

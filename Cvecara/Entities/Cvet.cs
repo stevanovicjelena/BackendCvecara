@@ -13,7 +13,10 @@ namespace Cvecara.Entities
         public int cvetID { get; set; }
         public string bojaCveta { get; set; }
         public decimal cenaCveta { get; set; }
-       [ForeignKey("VrstaCveta")]
+        public int kolicina { get; set; }
+        [ForeignKey("VrstaCveta")]
         public int vrstaCvetaID { get; set; }
+        [NotMapped]
+        public virtual VrstaCveta vrstaCveta { get; set; }
     }
 }

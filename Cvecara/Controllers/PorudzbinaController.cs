@@ -21,12 +21,18 @@ namespace Cvecara.Controllers
 
         private readonly LinkGenerator linkGenerator;
         private readonly IMapper mapper;
+        private readonly ICvetniAranzmanRepository cvetniAranzmanRepository;
+        private readonly IUserRepository userRepository;
+        private readonly ILokacijeRepository lokacijeRepository;
 
-        public PorudzbinaController(IPorudzbinaRepository porudzbinaRepository, LinkGenerator linkGenerator, IMapper mapper)
+        public PorudzbinaController(IPorudzbinaRepository porudzbinaRepository, ICvetniAranzmanRepository cvetniAranzmanRepository, IUserRepository userRepository, ILokacijeRepository lokacijeRepository, LinkGenerator linkGenerator, IMapper mapper)
         {
             this.porudzbinaRepository = porudzbinaRepository;
             this.linkGenerator = linkGenerator;
             this.mapper = mapper;
+            this.cvetniAranzmanRepository = cvetniAranzmanRepository;
+            this.userRepository = userRepository;
+            this.lokacijeRepository = lokacijeRepository;
 
         }
 
@@ -42,6 +48,21 @@ namespace Cvecara.Controllers
             if (porudzbine == null || porudzbine.Count == 0)
             {
                 return NoContent();
+            }
+
+            foreach (Porudzbina p in porudzbine)
+            {
+                CvetniAranzman cvetniAranzman = cvetniAranzmanRepository.GetCvetniAranzmanById(p.cvetniAranzmanID);
+                p.cvetniAranzman = cvetniAranzman;
+
+                User zaposleni = userRepository.GetUserById(p.zaposleniID);
+                p.zaposleni = zaposleni;
+
+                User kupac = userRepository.GetUserById(p.kupacID);
+                p.kupac = kupac;
+
+                Lokacije lokacija = lokacijeRepository.GetLokacijeById(p.lokacijaID);
+                p.lokacija = lokacija;
             }
 
             return Ok(porudzbine);
@@ -61,9 +82,52 @@ namespace Cvecara.Controllers
                 return NotFound();
             }
 
+            CvetniAranzman cvetniAranzman = cvetniAranzmanRepository.GetCvetniAranzmanById(porudzbina.cvetniAranzmanID);
+            porudzbina.cvetniAranzman = cvetniAranzman;
+
+            User zaposleni = userRepository.GetUserById(porudzbina.zaposleniID);
+            porudzbina.zaposleni = zaposleni;
+
+            User kupac = userRepository.GetUserById(porudzbina.kupacID);
+            porudzbina.kupac = kupac;
+
+            Lokacije lokacija = lokacijeRepository.GetLokacijeById(porudzbina.lokacijaID);
+            porudzbina.lokacija = lokacija;
+
             return Ok(mapper.Map<Porudzbina>(porudzbina));
         }
 
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        //[Authorize(Roles = "Kupac")]
+        [Authorize]
+        [HttpGet("porudzbinabykupac/{kupacId}")]
+        public ActionResult<Porudzbina> GetPorudzbinaKupac(int kupacId)
+        {
+            var porudzbine = porudzbinaRepository.GetPorudzbinaByKupac(kupacId);
+
+            if (porudzbine == null)
+            {
+                return NotFound();
+            }
+
+            foreach (Porudzbina p in porudzbine)
+            {
+                CvetniAranzman cvetniAranzman = cvetniAranzmanRepository.GetCvetniAranzmanById(p.cvetniAranzmanID);
+                p.cvetniAranzman = cvetniAranzman;
+
+                User zaposleni = userRepository.GetUserById(p.zaposleniID);
+                p.zaposleni = zaposleni;
+
+                User kupac = userRepository.GetUserById(p.kupacID);
+                p.kupac = kupac;
+
+                Lokacije lokacija = lokacijeRepository.GetLokacijeById(p.lokacijaID);
+                p.lokacija = lokacija;
+            }
+
+            return Ok(porudzbine);
+        }
 
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -76,6 +140,10 @@ namespace Cvecara.Controllers
             {
 
                 Porudzbina porudzbinaEntity = mapper.Map<Porudzbina>(porudzbina);
+
+            //    var ukupnaCena = porudzbinaEntity.cvetniAranzman.cenaAranzmana * porudzbinaEntity.kolicina;
+             //   porudzbinaEntity.cenaPorudzbine = ukupnaCena;
+
                 Porudzbina confirmation = porudzbinaRepository.CreatePorudzbina(porudzbinaEntity);
                 porudzbinaRepository.SaveChanges();
 

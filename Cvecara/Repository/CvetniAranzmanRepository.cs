@@ -18,9 +18,12 @@ namespace Cvecara.Repository
             this.mapper = mapper;
         }
 
-        public List<CvetniAranzman> GetAllCvetniAranzmani()
+        public List<CvetniAranzman> GetAllCvetniAranzmani(string nazivCvetnogAranzmana)
         {
-            return context.CvetniAranzman.ToList();
+            var cvetniAranzmani = context.CvetniAranzman.ToList();
+            return (from c in cvetniAranzmani
+                    where string.IsNullOrEmpty(nazivCvetnogAranzmana) || c.nazivAranzmana == nazivCvetnogAranzmana
+                    select c).ToList();
         }
 
         public CvetniAranzman GetCvetniAranzmanById(int cvetniAranzmanId)

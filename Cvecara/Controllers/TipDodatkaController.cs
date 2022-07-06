@@ -36,9 +36,9 @@ namespace Cvecara.Controllers
         [Authorize(Roles = "Zaposleni, Kupac")]
         [HttpGet]
         [HttpHead]
-        public ActionResult<List<TipDodatka>> GetTipoviDodataka()
+        public ActionResult<List<TipDodatka>> GetTipoviDodataka(string nazivTipa)
         {
-            var tipoviDodataka = tipDodatkaRepository.GetAllTipoveDodataka();
+            var tipoviDodataka = tipDodatkaRepository.GetAllTipoveDodataka(nazivTipa);
             if (tipoviDodataka == null || tipoviDodataka.Count == 0)
             {
                 return NoContent();

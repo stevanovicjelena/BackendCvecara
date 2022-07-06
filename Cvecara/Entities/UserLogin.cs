@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Cvecara.Entities
 {
-    public class KupacLogin
+    public class UserLogin
     {
         public string korisnickoIme { get; set; }
         public string lozinka { get; set; }
